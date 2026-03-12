@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:chip_counter/widgets/denomination.dart';
 import 'package:flutter/material.dart';
 import '/params.dart';

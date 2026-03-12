@@ -95,13 +95,27 @@ class _PlayerCardState extends State<PlayerCard> {
                     width: screenWidth * 0.4,
                     height: screenHeight * cardHeight,
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      playersList[index].name,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 19,
-                        fontWeight: FontWeight.normal,
-                      ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            playersList[index].name,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 19,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(
+                          playersList[index].directAmountMode
+                              ? Icons.attach_money
+                              : Icons.casino,
+                          size: 16,
+                          color: Colors.grey[500],
+                        ),
+                      ],
                     ),
                   ),
                 ),

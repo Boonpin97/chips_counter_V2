@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import '/class/players.dart';
 
+class _Transaction {
+  final String from;
+  final String to;
+  final double amount;
+  _Transaction(this.from, this.to, this.amount);
+}
+
 class SimplifyDebt extends StatelessWidget {
   final List<Players> playersList;
   SimplifyDebt(this.playersList, {Key? key}) : super(key: key);
 
-  /// Computes settlement transactions without mutating any Player objects.
-  String _buildDebtString(List<Players> players) {
-    // Build local mutable copies of names and amounts
+  List<_Transaction> _buildTransactions(List<Players> players) {
     List<String> giverNames = [];
     List<double> giverAmounts = [];
     List<String> receiverNames = [];
@@ -23,7 +28,6 @@ class SimplifyDebt extends StatelessWidget {
       }
     }
 
-    // Sort both lists largest-first for fewest transactions
     final giverOrder = List.generate(giverNames.length, (i) => i)
       ..sort((a, b) => giverAmounts[b].compareTo(giverAmounts[a]));
     giverNames = [for (final i in giverOrder) giverNames[i]];
@@ -34,21 +38,19 @@ class SimplifyDebt extends StatelessWidget {
     receiverNames = [for (final i in receiverOrder) receiverNames[i]];
     receiverAmounts = [for (final i in receiverOrder) receiverAmounts[i]];
 
-    String result = '';
+    final transactions = <_Transaction>[];
     int gi = 0, ri = 0;
     while (gi < giverNames.length && ri < receiverNames.length) {
       final pay = giverAmounts[gi] < receiverAmounts[ri]
           ? giverAmounts[gi]
           : receiverAmounts[ri];
-      result +=
-          '${giverNames[gi]}  →  ${receiverNames[ri]}   ${pay.toStringAsFixed(2)}\n';
+      transactions.add(_Transaction(giverNames[gi], receiverNames[ri], pay));
       giverAmounts[gi] -= pay;
       receiverAmounts[ri] -= pay;
       if (giverAmounts[gi] < 0.005) gi++;
       if (receiverAmounts[ri] < 0.005) ri++;
     }
-
-    return result;
+    return transactions;
   }
 
   @override
@@ -58,7 +60,7 @@ class SimplifyDebt extends StatelessWidget {
       net += player.earning;
     }
     final bool hasMismatch = net.abs() > 0.005;
-    final String debtString = _buildDebtString(playersList);
+    final transactions = _buildTransactions(playersList);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -93,19 +95,54 @@ class SimplifyDebt extends StatelessWidget {
               ],
             ),
           ),
-        if (debtString.isNotEmpty)
+        if (transactions.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              debtString,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20, color: Colors.black),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Column(
+              children: transactions.map((t) => Card(
+                elevation: 2,
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          t.from,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          const Icon(Icons.arrow_forward, color: Color(0xFF10E99A), size: 22),
+                          Text(
+                            t.amount.toStringAsFixed(2),
+                            style: const TextStyle(fontSize: 16, color: Color(0xFF10E99A), fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Text(
+                          t.to,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )).toList(),
             ),
           )
         else if (!hasMismatch)
-          const Text(
-            'All settled!',
-            style: TextStyle(fontSize: 20, color: Colors.black),
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'All settled! 🎉',
+              style: TextStyle(fontSize: 20, color: Colors.black),
+            ),
           ),
       ],
     );

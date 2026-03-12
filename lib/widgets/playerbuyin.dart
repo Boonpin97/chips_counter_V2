@@ -148,6 +148,22 @@ class _PlayerBuyInState extends State<PlayerBuyIn> {
               },
             ),
           ),
+          if (playersList.isEmpty)
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.person_add, size: 40, color: Colors.grey[400]),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap + to add a player',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           (playersList.length < 8)
               ? Container(
                   width: screenWidth * whiteAreaWidth,
