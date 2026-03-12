@@ -1,59 +1,31 @@
-name: Build and Deploy to Firebase Hosting
-
+name: Deploy to Firebase Hosting on merge
 on:
   push:
     branches:
       - main
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  build-and-deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      # Install Flutter SDK
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          channel: stable
+          cache: true
 
-      - name: Verify Flutter installation
-        run: flutter --version
+      # (Recommended) Fetch dependencies
+      - run: flutter pub get
 
-      - name: Install dependencies
-        run: flutter pub get
+      # Build the web app
+      - run: flutter build web --release
 
-      - name: Create Firebase config
-        run: |
-          cat > web/firebase-config.js << 'EOF'
-          import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-          import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-
-          const firebaseConfig = {
-            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
-            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "${{ secrets.FIREBASE_APP_ID }}",
-            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
-          };
-
-          const app = initializeApp(firebaseConfig);
-          const analytics = getAnalytics(app);
-          EOF
-
-      - name: Build Flutter web
-        run: flutter build web --release
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      # Deploy to Firebase Hosting
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CHIPS_COUNTER }}
           channelId: live
           projectId: chips-counter
