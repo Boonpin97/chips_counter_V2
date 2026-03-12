@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '/class/players.dart';
 
@@ -12,6 +11,11 @@ class EarningCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    final earningColor = player.earning > 0.005
+        ? Colors.green
+        : player.earning < -0.005
+            ? Colors.red
+            : Colors.black;
     return Row(
       children: [
         Container(
@@ -29,7 +33,7 @@ class EarningCard extends StatelessWidget {
           height: screenHeight * cardHeight,
           alignment: Alignment.center,
           child: Text(
-            player.total.toString(),
+            player.total.toStringAsFixed(2),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, color: Colors.black),
           ),
@@ -39,9 +43,9 @@ class EarningCard extends StatelessWidget {
           height: screenHeight * cardHeight,
           alignment: Alignment.center,
           child: Text(
-            player.earning.toString(),
+            player.earning.toStringAsFixed(2),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20, color: Colors.black),
+            style: TextStyle(fontSize: 20, color: earningColor, fontWeight: FontWeight.bold),
           ),
         ),
       ],

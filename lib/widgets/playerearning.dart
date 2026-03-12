@@ -19,7 +19,7 @@ class PlayerEarning extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      decoration: const BoxDecoration(color: const Color(0xFFEDEDB8)),
+      decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
       alignment: Alignment.center,
       child: Column(
         children: [
