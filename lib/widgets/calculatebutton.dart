@@ -27,9 +27,12 @@ class CalculateButton extends StatelessWidget {
             //arguments: ScreenArguments(index),
           );
         },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF10E99A),
+        ),
         child: const Text(
           'Calculate',
-          style: TextStyle(fontSize: 20, color: Colors.green),
+          style: TextStyle(fontSize: 20, color: Colors.white),
         ),
       ),
     );
